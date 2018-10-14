@@ -11,7 +11,17 @@ from __future__ import unicode_literals
 #     - all fields for current note (from fields window)
 #     - all fields for all notes (from main window)
 #     - all cards in the browser (from main window)
-
+# 
+#
+# Structure of this addon:
+# - to change all notes there is the function batch_change_fonts_all_fields_all_notes
+# - FieldDialog.__init__ is overwritten to add Up/Down arrows and
+#   a pushbutton to change AllFonts
+# - for the up/down buttons there is a function onMove
+# - When you press AllFonts the function onAllFonts is called with calls
+#   a minimal "helper" class "Batch_Fonts_Dialog" that that opens a dialog 
+#   designed in with qtdesigner. This dialog is included here because I 
+#   think if everything in one file is easier to handle. 
 
 
 import aqt
@@ -156,26 +166,27 @@ def __init__(self, mw, note, ord=0, parent=None):
     self.form.setupUi(self)
 
     ####start of my mod
+
     #up/down
     self.form.udbox = QtGui.QHBoxLayout()
     layout = self.form.udbox
 
     bu = QtGui.QToolButton()
     bu.setArrowType(Qt.UpArrow)
-    bu.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+    bu.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+    bu.setFixedWidth(40)
     bu.clicked.connect(lambda _: self.onMove(-1))
     layout.addWidget(bu)
 
     bd = QtGui.QToolButton()
     bd.setArrowType(Qt.DownArrow)
-    bd.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+    bd.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+    bd.setFixedWidth(40)
     bd.clicked.connect(lambda _: self.onMove(1))
     layout.addWidget(bd)
 
     self.form.verticalLayout_3.addLayout(self.form.udbox)
 
-
-    #self.form.setupUi(self) muss davor sein, sonst sind ja attribute noch nicht vergeben
     self.form.allfonts = QtGui.QPushButton(self)
     self.form.allfonts.setText("AllFonts")
     self.form.allfonts.clicked.connect(self.onAllFonts)
